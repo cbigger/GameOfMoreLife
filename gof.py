@@ -1,181 +1,104 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "7c7fd258",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "pip install pygame"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "6924b9df",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "67131da7",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "7c5f70b6",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "pygame 2.5.2 (SDL 2.28.3, Python 3.9.7)\n",
-      "Hello from the pygame community. https://www.pygame.org/contribute.html\n"
-     ]
-    }
-   ],
-   "source": [
-    "import pygame\n",
-    "import random\n",
-    "pygame.init()\n",
-    "\n",
-    "def makeGrid(rows, columns):\n",
-    "    return [[0 for _ in range(rows)] for _ in range(columns)]\n",
-    "\n",
-    "def updateWin():\n",
-    "    global Size, Matrix, window, width, height\n",
-    "    pixel_size = width / Size\n",
-    "    for i in range(Size):\n",
-    "        for j in range(Size):\n",
-    "            color = (255, 255, 255) if Matrix[i][j] == 0 else (0, 0, 0)\n",
-    "            pygame.draw.rect(window, color, pygame.Rect(pixel_size*i, pixel_size*j, pixel_size, pixel_size))\n",
-    "    for line in range(Size):\n",
-    "        pygame.draw.line(window, (116, 116, 116), (0, line * width/Size), (width, line * width/Size))\n",
-    "        pygame.draw.line(window, (116, 116, 116), (line * height/Size, 0), (line * height/Size, height))\n",
-    "    pygame.display.update()\n",
-    "\n",
-    "def moveCells():\n",
-    "    global Matrix, Size\n",
-    "    MatrixNewGen = makeGrid(Size, Size)\n",
-    "    for i in range(Size):\n",
-    "        for j in range(Size):\n",
-    "            try:\n",
-    "                surroundingCells = [\n",
-    "                    Matrix[i-1][j-1], Matrix[i-1][j], Matrix[i-1][j+1],\n",
-    "                    Matrix[i][j-1],                  Matrix[i][j+1],\n",
-    "                    Matrix[i+1][j-1], Matrix[i+1][j], Matrix[i+1][j+1]\n",
-    "                ]\n",
-    "            except IndexError:\n",
-    "                surroundingCells = []\n",
-    "\n",
-    "            surroundingCount = sum(surroundingCells)\n",
-    "\n",
-    "            if Matrix[i][j] == 1 and surroundingCount in (2, 3):\n",
-    "                MatrixNewGen[i][j] = 1\n",
-    "            elif Matrix[i][j] == 0 and surroundingCount == 3:\n",
-    "                MatrixNewGen[i][j] = 1\n",
-    "\n",
-    "    Matrix = MatrixNewGen\n",
-    "\n",
-    "def randomize():\n",
-    "    global Matrix\n",
-    "    for row in Matrix:\n",
-    "        for i in range(len(row)):\n",
-    "            row[i] = random.randint(0, 1)\n",
-    "\n",
-    "def clear():\n",
-    "    global Matrix\n",
-    "    for row in Matrix:\n",
-    "        for i in range(len(row)):\n",
-    "            row[i] = 0\n",
-    "\n",
-    "def MouseSetting(button):\n",
-    "    global Matrix, width, height, Size\n",
-    "    MouseCords = pygame.mouse.get_pos()\n",
-    "    MouseX = int(MouseCords[0] // (width/Size))\n",
-    "    MouseY = int(MouseCords[1] // (height/Size))\n",
-    "    if button in (1, 3):  # Handles both left and right clicks\n",
-    "        Matrix[MouseX][MouseY] = 1 - Matrix[MouseX][MouseY]\n",
-    "\n",
-    "def stepForward():\n",
-    "    moveCells()\n",
-    "    updateWin()\n",
-    "\n",
-    "width, height = 1400, 1400\n",
-    "Size = 150   #\n",
-    "Matrix = makeGrid(Size, Size)\n",
-    "window = pygame.display.set_mode((width, height))\n",
-    "pygame.display.set_caption(\"Game\")\n",
-    "FPS = 20\n",
-    "def main():\n",
-    "    clock = pygame.time.Clock()\n",
-    "    move = False\n",
-    "    run = True\n",
-    "    while run:\n",
-    "        clock.tick(FPS)\n",
-    "        for event in pygame.event.get():\n",
-    "            if event.type == pygame.QUIT:\n",
-    "                run = False\n",
-    "            elif event.type == pygame.MOUSEBUTTONDOWN:\n",
-    "                MouseSetting(event.button)\n",
-    "            elif event.type == pygame.KEYDOWN:  # Checks if any key is pressed down\n",
-    "                if event.key == pygame.K_DOWN:\n",
-    "                    move = False\n",
-    "                elif event.key == pygame.K_UP:\n",
-    "                    move = True\n",
-    "                elif event.key == pygame.K_LEFT:\n",
-    "                    randomize()\n",
-    "                elif event.key == pygame.K_RIGHT:\n",
-    "                    clear()\n",
-    "                elif event.key == pygame.K_s and not move:\n",
-    "                    stepForward()  # Steps forward when 's' is pressed and the game is paused\n",
-    "\n",
-    "        if move:\n",
-    "            moveCells()\n",
-    "        updateWin()\n",
-    "\n",
-    "    pygame.quit()\n",
-    "\n",
-    "\n",
-    "if __name__ == \"__main__\":\n",
-    "    main()\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "7624adfc",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.9.7"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+import pygame
+import random
+pygame.init()
+
+def makeGrid(rows, columns):
+    return [[0 for _ in range(rows)] for _ in range(columns)]
+
+def updateWin():
+    global Size, Matrix, window, width, height
+    pixel_size = width / Size
+    for i in range(Size):
+        for j in range(Size):
+            color = (255, 255, 255) if Matrix[i][j] == 0 else (0, 0, 0)
+            pygame.draw.rect(window, color, pygame.Rect(pixel_size*i, pixel_size*j, pixel_size, pixel_size))
+    for line in range(Size):
+        pygame.draw.line(window, (116, 116, 116), (0, line * width/Size), (width, line * width/Size))
+        pygame.draw.line(window, (116, 116, 116), (line * height/Size, 0), (line * height/Size, height))
+    pygame.display.update()
+
+def moveCells():
+    global Matrix, Size
+    MatrixNewGen = makeGrid(Size, Size)
+    for i in range(Size):
+        for j in range(Size):
+            try:
+                surroundingCells = [
+                    Matrix[i-1][j-1], Matrix[i-1][j], Matrix[i-1][j+1],
+                    Matrix[i][j-1],                  Matrix[i][j+1],
+                    Matrix[i+1][j-1], Matrix[i+1][j], Matrix[i+1][j+1]
+                ]
+            except IndexError:
+                surroundingCells = []
+
+            surroundingCount = sum(surroundingCells)
+
+            if Matrix[i][j] == 1 and surroundingCount in (2, 3):
+                MatrixNewGen[i][j] = 1
+            elif Matrix[i][j] == 0 and surroundingCount == 3:
+                MatrixNewGen[i][j] = 1
+
+    Matrix = MatrixNewGen
+
+def randomize():
+    global Matrix
+    for row in Matrix:
+        for i in range(len(row)):
+            row[i] = random.randint(0, 1)
+
+def clear():
+    global Matrix
+    for row in Matrix:
+        for i in range(len(row)):
+            row[i] = 0
+
+def MouseSetting(button):
+    global Matrix, width, height, Size
+    MouseCords = pygame.mouse.get_pos()
+    MouseX = int(MouseCords[0] // (width/Size))
+    MouseY = int(MouseCords[1] // (height/Size))
+    if button in (1, 3):  # Handles both left and right clicks
+        Matrix[MouseX][MouseY] = 1 - Matrix[MouseX][MouseY]
+
+def stepForward():
+    moveCells()
+    updateWin()
+
+width, height = 1400, 1400
+Size = 150   #
+Matrix = makeGrid(Size, Size)
+window = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Game")
+FPS = 20
+def main():
+    clock = pygame.time.Clock()
+    move = False
+    run = True
+    while run:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                MouseSetting(event.button)
+            elif event.type == pygame.KEYDOWN:  # Checks if any key is pressed down
+                if event.key == pygame.K_DOWN:
+                    move = False
+                elif event.key == pygame.K_UP:
+                    move = True
+                elif event.key == pygame.K_LEFT:
+                    randomize()
+                elif event.key == pygame.K_RIGHT:
+                    clear()
+                elif event.key == pygame.K_s and not move:
+                    stepForward()  # Steps forward when 's' is pressed and the game is paused
+
+        if move:
+            moveCells()
+        updateWin()
+
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    main()
