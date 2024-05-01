@@ -15,3 +15,6 @@ Pause Game == `down`
 Single Frame Update == `s`
 
 When paused, you can manually fill/empty cells with a left or right mouseclick.
+
+
+![image](https://github.com/cbigger/GameOfMoreLife/assets/53627581/fe8481be-750e-4f45-badf-3e968e226c65)
